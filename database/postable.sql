@@ -1,0 +1,44 @@
+--1. Crear la base de datos
+--CREATE DATABASE postable;
+
+--2. Eliminar tablas si ya existen (en orden de dependencias)
+DROP TABLE IF EXISTS Likes;
+DROP TABLE IF EXISTS Posts;
+DROP TABLE IF EXISTS Users;
+
+--3 Crear la tabla users
+CREATE TABLE
+  Users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(30) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    firstName VARCHAR(50),
+    lastName VARCHAR(50), 
+    role VARCHAR(10) NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+    createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  --3. Crear tabla posts
+CREATE TABLE
+  Posts (
+    id SERIAL PRIMARY KEY,
+    userId INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT FK_User FOREIGN KEY (userId) REFERENCES Users (id) ON DELETE CASCADE
+  );
+
+--4. Crear tabla Likes
+CREATE TABLE
+  Likes (
+    id SERIAL PRIMARY KEY,
+    postId INTEGER NOT NULL,
+    userId INTEGER NOT NULL,
+    createdAt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,    
+    CONSTRAINT FK_Post FOREIGN KEY (postId) REFERENCES Posts (id) ON DELETE CASCADE,
+    CONSTRAINT FK_User FOREIGN KEY (userId) REFERENCES Users (id) ON DELETE CASCADE,
+    UNIQUE (postId, userId)
+  );
